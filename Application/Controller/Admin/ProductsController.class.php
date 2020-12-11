@@ -17,7 +17,9 @@ class ProductsController extends Controller
         $model = new ProductsModel();
         $list  = $model->select();
         //加载视图
-        require __VIEW__ . 'products_list.html';
+        // require __VIEW__ . 'products_list.html';
+        $this->smarty->assign('list',$list);
+        $this->smarty->display('products_list.html');
     }
 
     //删除商品
