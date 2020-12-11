@@ -14,6 +14,10 @@ return [
         'dc'   => 'Products',     //默认控制器
         'da'   => 'list',          //默认方法
         'salt' => 'itcast',       //加密秘钥
+        // 上传配置
+        'path' => './Public/Uploads/',
+        'size' => 1234567,
+        'type' => ['image/png', 'image/jpeg', 'image/gif'],
     ],
 ];
  

@@ -7,6 +7,8 @@ use Core\Model;
 use Model\UserModel;
 use Traits\Jump;
 use Lib\Captcha;
+use Lib\Upload;
+use Lib\Image;
 
 class LoginController extends BaseController
 {
@@ -41,6 +43,26 @@ class LoginController extends BaseController
     {
         //第二步：执行注册逻辑
         if (!empty($_POST)) {
+            //校验验证码
+            $captcha = new Captcha();
+            if (!$captcha->check($_POST['passcode'])) {
+                $this->error('index.php?p=Admin&c=Login&a=login', '验证码错误');
+            }
+
+            //文件上传
+            $path   = $GLOBALS['config']['app']['path'];
+            $size   = $GLOBALS['config']['app']['size'];
+            $type   = $GLOBALS['config']['app']['type'];
+            $upload = new Upload($path, $size, $type);
+            if ($filepath = $upload->uploadOne($_FILES['face'])) {
+                //生成缩略图
+                $image             = new Image();
+                $data['user_face'] = $image->thumb($path . $filepath, 's1_');
+            } else {
+                $this->error('index.php?p=Admin&c=Login&a=register', $upload->getError());
+            }
+            //文件上传结束
+
             $data['user_name'] = $_POST['username'];
             $data['user_pwd']  = md5(md5($_POST['password']) . $GLOBALS['config']['app']['salt']);
             $model             = new Model('user');
