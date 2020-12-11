@@ -29,12 +29,21 @@ class LoginController extends BaseController
             if ($info = $model->getUserByNameAndPwd($_POST['username'], $_POST['password'])) {
                 $_SESSION['user'] = $info;   //将用户信息保存到会话中
                 $model->updateLoginInfo();   //更新登陆信息
+                // 记录用户名和密码
+                if (isset($_POST['remember'])) {
+                    // 存入cookie中
+                    $time = time() + 3600 * 24 * 7;
+                    setcookie('name', $_POST['username'], $time);
+                    setcookie('pwd', $_POST['password'], $time);
+                }
                 $this->success('index.php?p=Admin&c=Admin&a=admin', '登陆成功');
             } else {
                 $this->error('index.php?p=Admin&c=Login&a=login', '登陆失败，请重新登陆');
             }
         }
         //第一步：显示登陆界面
+        $name = $_COOKIE['name'] ?? '';
+        $pwd  = $_COOKIE['pwd'] ?? '';
         require __VIEW__ . 'login.html';
     }
 
@@ -86,6 +95,13 @@ class LoginController extends BaseController
     {
         $captcha = new Captcha();
         $captcha->entry();
+    }
+
+    // 退出
+    public function logoutAction()
+    {
+        session_destroy();
+        header('location:index.php?p=Admin&c=Login&a=login');
     }
 }
  
